@@ -8,7 +8,6 @@ return response.json('Rodando')});
 app.listen(8080, () => console.log("Servidor iniciado"));
 
 const usuarios = [];
-const recados = [];
 
 //middleware de verificação de email
 function emailExistente(request, response, next) {
@@ -31,7 +30,8 @@ app.post("/usuarios", emailExistente ,(request, response)=>{
                     id: Math.floor(Math.random()*67676),
                     nome: usuario.nome,
                     email: usuario.email,
-                    senha: hash
+                    senha: hash,
+                    recados:[]
                 })
                 return response.status(200).json("Cadastrado!");
             } else {
@@ -41,16 +41,16 @@ app.post("/usuarios", emailExistente ,(request, response)=>{
 // login
 app.post("/usuario/login", (request, response)=>{
     const login = request.body;
-    const id = login.id;
+    const email = login.email;
     const senha = login.senha;
 
-    const usuario = usuarios.find(usuario=> usuario.id===id)
-    if(!usuario){return response.status(402).json("Digite um ID válido")}
+    const usuario = usuarios.find(usuario=> usuario.email===email)
+    if(!usuario){return response.status(402).json("Digite um Email válido")}
     bcrypt.compare(senha, usuario.senha, function(err,result){
         if(result){
             return response.status(200).json(`Bem vindo ${usuario.nome}!`)
         } else{
-            return response.status(402).json("Usuário inválido!")
+            return response.status(402).json("Senha inválida!")
         }
     })
 })
@@ -59,3 +59,21 @@ app.post("/usuario/login", (request, response)=>{
 app.get("/usuarios", (request, response)=>{
     return response.json(usuarios)
 })
+
+//criar recado
+app.post('/recados', (request, response) => {
+    const usuarioId = request.body.usuarioId;
+    const recado = request.body.recado;
+    const usuario = usuarios.find((u) => u.id === usuarioId);
+    if (!usuario) {
+      return response.status(404).json('Usuário não encontrado.');
+    }
+    const novoRecado = { 
+         id: Math.floor(Math.random() * 10000),
+         titulo: recado.titulo, 
+         descricao: recado.descricao 
+        };
+    usuario.recados.push(novoRecado);
+    response.status(201).json('Recado criado com sucesso!');
+  });
+  
