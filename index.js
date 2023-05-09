@@ -11,11 +11,11 @@ const usuarios = [];
 const recados = [];
 
 //middleware de verificação de email
-function emailExistente(req, res, next) {
-    const email = req.body.email;
-    const userExists = usuarios.some((user) => user.email === email);
-    if (userExists) {
-      return res.status(400).json({ error: 'Este email já está em uso.' });
+function emailExistente(request, response, next) {
+    const email = request.body.email;
+    const usuarioExiste = usuarios.some((usuario) => usuario.email === email);
+    if (usuarioExiste) {
+      return response.status(400).json('Email já está em uso.' );
     }
     next();
   }
@@ -48,7 +48,7 @@ app.post("/usuario/login", (request, response)=>{
     if(!usuario){return response.status(402).json("Digite um ID válido")}
     bcrypt.compare(senha, usuario.senha, function(err,result){
         if(result){
-            return response.status(200).json(`Bem vindo ${usuario}!`)
+            return response.status(200).json(`Bem vindo ${usuario.nome}!`)
         } else{
             return response.status(402).json("Usuário inválido!")
         }
