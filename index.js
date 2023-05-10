@@ -77,3 +77,28 @@ app.post('/recados', (request, response) => {
     response.status(201).json('Recado criado com sucesso!');
   });
   
+// ler recados
+app.get('/usuarios/:id/recados', (request, response) => {
+    const usuarioId = parseInt(request.params.id);
+    const usuario = usuarios.find((u) => u.id === usuarioId);
+    if (!usuario) {
+      return response.status(404).json('Usuário não encontrado.');
+    }
+    const recados = usuario.recados;
+    return response.json(recados);
+  });
+
+  //ler um recado especifico
+  app.get('/usuarios/:id/recados/:recadoId', (request, response) => {
+    const usuarioId = parseInt(request.params.id);
+    const recadoId = parseInt(request.params.recadoId);
+    const usuario = usuarios.find((usu) => usu.id === usuarioId);
+    if (!usuario) {
+      return response.status(404).json('Usuário não encontrado.');
+    }
+    const recado = usuario.recados.find((rec) => rec.id === recadoId);
+    if (!recado) {
+      return response.status(404).json('Recado não encontrado.');
+    }
+    return response.json(recado);
+  });
