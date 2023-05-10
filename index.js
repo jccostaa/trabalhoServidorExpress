@@ -102,3 +102,41 @@ app.get('/usuarios/:id/recados', (request, response) => {
     }
     return response.json(recado);
   });
+
+  //edição de recado
+  app.put('/usuarios/:id/recados/:recadoId', (request, response) => {
+    const usuarioId = parseInt(request.params.id);
+    const recadoId = parseInt(request.params.recadoId);
+    const novoRecado = request.body;
+    const usuario = usuarios.find((usu) => usu.id === usuarioId);
+    if (!usuario) {
+      return response.status(404).json('Usuário não encontrado.');
+    }
+    const recadoIndex = usuario.recados.findIndex((rec) => rec.id === recadoId);
+    if (recadoIndex < 0) {
+      return response.status(404).json('Recado não encontrado.');
+    }
+    usuario.recados[recadoIndex] = {
+      id: recadoId,
+      titulo: novoRecado.titulo,
+      descricao: novoRecado.descricao,
+    };
+    return response.json('Recado editado com sucesso!');
+  });
+  
+  // deletar um recado
+app.delete('/usuarios/:idUsuario/:idRecado', (request, response) => {
+    const idUsuario = Number(request.params.idUsuario);
+    const idRecado = Number(request.params.idRecado);
+    const usuario = usuarios.find((u) => u.id === idUsuario);
+    if (!usuario) {
+      return response.status(404).json('Usuário não encontrado.');
+    }
+    const recadoIndex = usuario.recados.findIndex((r) => r.id === idRecado);
+    if (recadoIndex < 0) {
+      return response.status(404).json('Recado não encontrado.');
+    }
+    usuario.recados.splice(recadoIndex, 1);
+  
+    return response.status(200).json("Recado deletado!");
+  });
