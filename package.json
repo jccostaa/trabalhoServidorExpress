@@ -17,6 +17,6 @@
     "js": "node -r sucrase/register"
     },
     "scripts": {
-      "dev": "nodemon index.js"
+      "dev": "nodemon src/index.js"
       }
 }
