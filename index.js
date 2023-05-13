@@ -9,7 +9,6 @@ app.listen(8080, () => console.log("Servidor iniciado"));
 
 const usuarios = [];
 
-//middleware de verificação de email
 function emailExistente(request, response, next) {
     const email = request.body.email;
     const usuarioExiste = usuarios.some((usuario) => usuario.email === email);
@@ -18,8 +17,6 @@ function emailExistente(request, response, next) {
     }
     next();
   }
-
-// criar usuario
 app.post("/usuarios", emailExistente ,(request, response)=>{
     const usuario = request.body;
     const saltRounds = 10;
@@ -38,7 +35,6 @@ app.post("/usuarios", emailExistente ,(request, response)=>{
                 return response.status(400).json("Ocorreu um erro:" + err)
             }})
 })
-// login
 app.post("/usuario/login", (request, response)=>{
     const login = request.body;
     const email = login.email;
@@ -55,12 +51,10 @@ app.post("/usuario/login", (request, response)=>{
     })
 })
 
-// ler usuarios
 app.get("/usuarios", (request, response)=>{
     return response.json(usuarios)
 })
 
-//criar recado
 app.post('/recados', (request, response) => {
     const usuarioId = request.body.usuarioId;
     const recado = request.body.recado;
@@ -77,7 +71,6 @@ app.post('/recados', (request, response) => {
     response.status(201).json('Recado criado com sucesso!');
   });
   
-// ler recados
 app.get('/usuarios/:id/recados', (request, response) => {
     const usuarioId = parseInt(request.params.id);
     const usuario = usuarios.find((u) => u.id === usuarioId);
@@ -88,7 +81,6 @@ app.get('/usuarios/:id/recados', (request, response) => {
     return response.json(recados);
   });
 
-  //ler um recado especifico
   app.get('/usuarios/:id/recados/:recadoId', (request, response) => {
     const usuarioId = parseInt(request.params.id);
     const recadoId = parseInt(request.params.recadoId);
@@ -103,7 +95,6 @@ app.get('/usuarios/:id/recados', (request, response) => {
     return response.json(recado);
   });
 
-  //edição de recado
   app.put('/usuarios/:id/recados/:recadoId', (request, response) => {
     const usuarioId = parseInt(request.params.id);
     const recadoId = parseInt(request.params.recadoId);
@@ -124,7 +115,6 @@ app.get('/usuarios/:id/recados', (request, response) => {
     return response.json('Recado editado com sucesso!');
   });
   
-  // deletar um recado
 app.delete('/usuarios/:idUsuario/:idRecado', (request, response) => {
     const idUsuario = Number(request.params.idUsuario);
     const idRecado = Number(request.params.idRecado);
