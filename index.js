@@ -1,11 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcrypt")
+const cors = require('cors')
 const app = express();
 app.use(express.json());
+app.use(cors());
+
+
 
 app.get('/', (request, response) => {
 return response.json('Rodando')});
-app.listen(8080, () => console.log("Servidor iniciado"));
+app.listen(3000, () => console.log("Servidor iniciado"));
 
 const usuarios = [];
 
@@ -26,18 +30,23 @@ app.post("/usuarios", emailExistente ,(request, response)=>{
     
         bcrypt.hash(usuario.senha, saltRounds, function(err, hash) {
             if(hash){
-                usuarios.push({
+                const novoUsuario = {
                     id: Math.floor(Math.random()*67676),
                     nome: usuario.nome,
                     email: usuario.email,
                     senha: hash,
                     recados:[]
-                })
-                return response.status(200).json("Cadastrado!");
+                }
+                usuarios.push(novoUsuario);
+                return response.status(200).json({
+                  message: "Cadastrado!",
+                  id:novoUsuario.id
+                });
             } else {
                 return response.status(400).json("Ocorreu um erro:" + err)
             }})
 })
+
 // login
 app.post("/usuario/login", (request, response)=>{
     const login = request.body;
@@ -48,7 +57,9 @@ app.post("/usuario/login", (request, response)=>{
     if(!usuario){return response.status(402).json("Digite um Email válido")}
     bcrypt.compare(senha, usuario.senha, function(err,result){
         if(result){
-            return response.status(200).json(`Bem vindo ${usuario.nome}!`)
+            return response.status(200).json({
+              message:`Bem vindo ${usuario.nome}!`,
+              id:usuario.id})
         } else{
             return response.status(402).json("Senha inválida!")
         }
@@ -77,15 +88,22 @@ app.post('/recados', (request, response) => {
     response.status(201).json('Recado criado com sucesso!');
   });
   
-// ler recados
+// ler recados e paginação
 app.get('/usuarios/:id/recados', (request, response) => {
     const usuarioId = parseInt(request.params.id);
     const usuario = usuarios.find((u) => u.id === usuarioId);
     if (!usuario) {
       return response.status(404).json('Usuário não encontrado.');
     }
-    const recados = usuario.recados;
-    return response.json(recados);
+    const page = request.query.page || 1;
+    const pages = Math.ceil(usuario.recados?.length / 3);
+    const indice = (page - 1) * 3;
+    const aux = [...usuario.recados];
+    const result = aux.splice(indice, 3);
+  
+    return response
+      .status(201)
+      .json({ total: usuario.recados.length, recados: result, pages });
   });
 
   //ler um recado especifico
