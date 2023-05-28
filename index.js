@@ -72,22 +72,24 @@ app.get("/usuarios", (request, response)=>{
 })
 
 //criar recado
-app.post('/recados', (request, response) => {
-    const usuarioId = request.body.usuarioId;
-    const recado = request.body.recado;
-    const usuario = usuarios.find((u) => u.id === usuarioId);
-    if (!usuario) {
-      return response.status(404).json('Usuário não encontrado.');
-    }
-    const novoRecado = { 
-         id: Math.floor(Math.random() * 10000),
-         titulo: recado.titulo, 
-         descricao: recado.descricao 
-        };
-    usuario.recados.push(novoRecado);
-    response.status(201).json('Recado criado com sucesso!');
-  });
-  
+app.post('/usuarios/:id/recados', (request, response) => {
+  const usuarioId = request.body.usuarioId;
+  const recado = request.body.recado;
+  const usuario = usuarios.find((u) => u.id === usuarioId);
+  if (!usuario) {
+    return response.status(404).json({
+      message: `Usuário não encontrado. ID: ${usuarioId}`
+    });
+  }
+  const novoRecado = {
+    id: Math.floor(Math.random() * 10000),
+    titulo: recado.titulo,
+    descricao: recado.descricao
+  };
+  usuario.recados.push(novoRecado);
+  response.status(201).json('Recado criado com sucesso!');
+});
+
 // ler recados e paginação
 app.get('/usuarios/:id/recados', (request, response) => {
     const usuarioId = parseInt(request.params.id);
@@ -101,9 +103,12 @@ app.get('/usuarios/:id/recados', (request, response) => {
     const aux = [...usuario.recados];
     const result = aux.splice(indice, 3);
   
-    return response
-      .status(201)
-      .json({ total: usuario.recados.length, recados: result, pages });
+    return response.status(201).json(
+        { 
+          total: usuario.recados.length,
+          recados: result, pages 
+        }
+      );
   });
 
   //ler um recado especifico
