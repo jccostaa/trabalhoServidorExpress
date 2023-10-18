@@ -148,18 +148,18 @@ app.get('/usuarios/:id/recados', (request, response) => {
   });
   
   // deletar um recado
-app.delete('/usuarios/:idUsuario/:idRecado', (request, response) => {
+  app.delete('/usuarios/:idUsuario/:idRecado', (request, response) => {
     const idUsuario = Number(request.params.idUsuario);
     const idRecado = Number(request.params.idRecado);
     const usuario = usuarios.find((u) => u.id === idUsuario);
     if (!usuario) {
       return response.status(404).json('Usuário não encontrado.');
     }
-    const recadoIndex = usuario.recados.findIndex((r) => r.id === idRecado);
-    if (recadoIndex < 0) {
+    const recadosFiltrados = usuario.recados.filter((r) => r.id !== idRecado);
+    if (recadosFiltrados.length === usuario.recados.length) {
       return response.status(404).json('Recado não encontrado.');
     }
-    usuario.recados.splice(recadoIndex, 1);
+    usuario.recados = recadosFiltrados;
   
     return response.status(200).json("Recado deletado!");
-  });
+ });
